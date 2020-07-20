@@ -10,6 +10,13 @@ import UIKit
 import Firebase
 
 class ConversationsViewController: UIViewController {
+    
+    private lazy var tableView: UITableView = {
+       let tableView = UITableView()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        
+        return tableView
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
