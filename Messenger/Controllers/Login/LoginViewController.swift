@@ -8,11 +8,13 @@
 
 import UIKit
 import Firebase
+import FBSDKLoginKit
+import GoogleSignIn
 
 class LoginViewController: UIViewController {
     
     private lazy var logoImageView: UIImageView = {
-       let imageView = UIImageView()
+        let imageView = UIImageView()
         imageView.image = UIImage(named: "logo")
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -69,11 +71,31 @@ class LoginViewController: UIViewController {
         button.addTarget(self, action: #selector(didTapLogginButton(_:)), for: .touchUpInside)
         return button
     }()
-
+    
+    private lazy var facebookLoginButton: FBLoginButton = {
+        let loginButton = FBLoginButton()
+        loginButton.delegate = self
+        loginButton.permissions = ["email", "public_profile"]
+        return loginButton
+    }()
+    
+    private lazy var googleLoginButton: GIDSignInButton = {
+        let loginButton = GIDSignInButton()
+        return loginButton
+    }()
+    
+    private var loginObserver: NSObjectProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
+        loginObserver = NotificationCenter.default.addObserver(forName: .didLoginNotification, object: nil, queue: .main) { [weak self] (_) in
+            self?.navigationController?.dismiss(animated: true, completion: nil)
+        }
+        
+        GIDSignIn.sharedInstance()?.presentingViewController = self
+        
         title = "Login"
         view.backgroundColor = .white
         
@@ -84,7 +106,14 @@ class LoginViewController: UIViewController {
         scrollView.addSubview(emailTextField)
         scrollView.addSubview(passwordTextField)
         scrollView.addSubview(loginButton)
-         
+        scrollView.addSubview(facebookLoginButton)
+        scrollView.addSubview(googleLoginButton)
+    }
+    
+    deinit {
+        if let observer = loginObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -95,6 +124,9 @@ class LoginViewController: UIViewController {
         emailTextField.frame = CGRect(x: 30, y: (logoImageView.bottom + 10), width: (scrollView.width - 60), height: 52)
         passwordTextField.frame = CGRect(x: 30, y: (emailTextField.bottom + 10), width: (scrollView.width - 60), height: 52)
         loginButton.frame = CGRect(x: 30, y: (passwordTextField.bottom + 10), width: (scrollView.width - 60), height: 52)
+        facebookLoginButton.frame = CGRect(x: 30, y: (loginButton.bottom + 10), width: (scrollView.width - 60), height: 52)
+        facebookLoginButton.center = scrollView.center        
+        googleLoginButton.frame = CGRect(x: 30, y: (facebookLoginButton.bottom + 10), width: (scrollView.width - 60), height: 52)
     }
     
     func alertUserLoginError() {
@@ -138,5 +170,52 @@ extension LoginViewController: UITextFieldDelegate {
             didTapLogginButton(loginButton)
         }
         return true
+    }
+}
+
+extension LoginViewController: LoginButtonDelegate {
+    
+    func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
+        guard let token = result?.token?.tokenString else {
+            print("User failed to login with facebook")
+            return
+        }
+        
+        let facebookRequest = FBSDKLoginKit.GraphRequest(graphPath: "me", parameters: ["fields": "email, name"], tokenString: token, version: nil, httpMethod: .get)
+        facebookRequest.start { (_, result, error) in
+            guard let result = result as? [String:Any], error == nil else {
+                print("Failed to make facebook graph request")
+                return
+            }
+            print(result)
+            guard let username = result["name"] as? String, let email = result["email"] as? String else {
+                print("Failed to get email from facebook result")
+                return 
+            }
+            let nameComponents = username.components(separatedBy: " ")
+            guard nameComponents.count == 2 else { return }
+            let firstName = nameComponents[0]
+            let lastName = nameComponents[1]
+            
+            DatabaseManager.shared.userExists(with: email) { (exists) in
+                if !exists {
+                    DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email))
+                }
+            }
+            
+            let credential = FacebookAuthProvider.credential(withAccessToken: token)
+            Auth.auth().signIn(with: credential) { [weak self] (authResult, error) in
+                guard let _ = authResult, error == nil else {
+                    print("Facebook credential login failed:", error!)
+                    return
+                }
+                print("Successfully logged user in")
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }
+    }
+    
+    func loginButtonDidLogOut(_ loginButton: FBLoginButton) {
+        // no operation
     }
 }
