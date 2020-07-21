@@ -23,6 +23,9 @@
 		E07EAD3E24C540780010A31A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E07EAD3D24C540780010A31A /* Extensions.swift */; };
 		E0C4633124C5557900016791 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E0C4633024C5557900016791 /* GoogleService-Info.plist */; };
 		E0C4633324C561B600016791 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C4633224C561B600016791 /* DatabaseManager.swift */; };
+		E0C4633524C6001000016791 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C4633424C6001000016791 /* ChatViewController.swift */; };
+		E0C4633724C60AAD00016791 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C4633624C60AAD00016791 /* StorageManager.swift */; };
+		E0C4633924C681FC00016791 /* ConversationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C4633824C681FB00016791 /* ConversationTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +49,9 @@
 		E07EAD3D24C540780010A31A /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		E0C4633024C5557900016791 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E0C4633224C561B600016791 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
+		E0C4633424C6001000016791 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		E0C4633624C60AAD00016791 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
+		E0C4633824C681FB00016791 /* ConversationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +124,7 @@
 				E07EAD3624C539DF0010A31A /* VideoPlayerViewController.swift */,
 				E07EAD3824C53A090010A31A /* NewConversationViewController.swift */,
 				E07EAD3A24C53A2C0010A31A /* ProfileViewController.swift */,
+				E0C4633424C6001000016791 /* ChatViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -127,6 +134,7 @@
 			children = (
 				E07EAD2F24C538C00010A31A /* Storyboards */,
 				E07EAD1F24C537900010A31A /* Assets.xcassets */,
+				E0C4633824C681FB00016791 /* ConversationTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -152,6 +160,7 @@
 				E07EAD1824C5378E0010A31A /* SceneDelegate.swift */,
 				E07EAD3D24C540780010A31A /* Extensions.swift */,
 				E0C4633224C561B600016791 /* DatabaseManager.swift */,
+				E0C4633624C60AAD00016791 /* StorageManager.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -318,7 +327,10 @@
 				E07EAD1724C5378E0010A31A /* AppDelegate.swift in Sources */,
 				E07EAD3B24C53A2C0010A31A /* ProfileViewController.swift in Sources */,
 				E07EAD1924C5378E0010A31A /* SceneDelegate.swift in Sources */,
+				E0C4633924C681FC00016791 /* ConversationTableViewCell.swift in Sources */,
+				E0C4633524C6001000016791 /* ChatViewController.swift in Sources */,
 				E07EAD3524C539D20010A31A /* PhotoViewerViewController.swift in Sources */,
+				E0C4633724C60AAD00016791 /* StorageManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
