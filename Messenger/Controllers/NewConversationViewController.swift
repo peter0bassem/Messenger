@@ -9,7 +9,7 @@
 import UIKit
 import JGProgressHUD
 
-class NewConversationViewController: UIViewController {
+final class NewConversationViewController: UIViewController {
     
     private lazy var spinnder: JGProgressHUD = {
         let spinner = JGProgressHUD(style: .dark)
@@ -25,7 +25,7 @@ class NewConversationViewController: UIViewController {
     
     private lazy var usersTableView: UITableView = {
         let tableView = UITableView()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(NewConversationTableViewCell.self, forCellReuseIdentifier: NewConversationTableViewCell.identifier)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.isHidden = true
@@ -43,10 +43,10 @@ class NewConversationViewController: UIViewController {
     }()
     
     private var users = [[String:String]]()
-    private var results = [[String:String]]()
+    private var results = [SearchResult]()
     private var hasFetched = false
     
-    public var completion: (([String:String]) -> Void)?
+    public var completion: ((SearchResult) -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,7 +54,7 @@ class NewConversationViewController: UIViewController {
         // Do any additional setup after loading the view.
         navigationController?.navigationBar.topItem?.titleView = searchBar
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Cacnel", style: .done, target: self, action: #selector(didTapCancelBarButton(_:)))
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         searchBar.becomeFirstResponder()
         
         view.addSubview(noResultsLabel)
@@ -78,9 +78,14 @@ extension NewConversationViewController: UITableViewDataSource, UITableViewDeleg
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = usersTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = results[indexPath.row]["name"]
+        let cell = usersTableView.dequeueReusableCell(withIdentifier: NewConversationTableViewCell.identifier, for: indexPath) as! NewConversationTableViewCell
+        let result = results[indexPath.row]
+        cell.configure(wit: result)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 90
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -102,7 +107,7 @@ extension NewConversationViewController: UISearchBarDelegate {
         results.removeAll()
         spinnder.show(in: view)
         
-        self.searchUsers(query: text)
+        searchUsers(query: text)
     }
     
     func searchUsers(query: String) {
@@ -127,11 +132,16 @@ extension NewConversationViewController: UISearchBarDelegate {
     
     func filterUsers(with term: String) {
         // update the UI: either show result or show no results label
-        guard hasFetched else { return }
+        guard var currentUserEmail = UserDefaults.standard.string(forKey: "email"), hasFetched else { return }
+        currentUserEmail = DatabaseManager.safeEmail(email: currentUserEmail)
         self.spinnder.dismiss()
-        let results = self.users.filter {
+        let results: [SearchResult] = users.filter {
+            guard let email = $0["email"], email != currentUserEmail else { return false }
             guard let name = $0["name"]?.lowercased() else { return false }
             return name.hasPrefix(term.lowercased())
+        }.compactMap {
+            guard let email = $0["email"], let name = $0["name"] else { return nil }
+            return SearchResult(name: name, email: email)
         }
         self.results = results
         updateUI()
@@ -139,12 +149,12 @@ extension NewConversationViewController: UISearchBarDelegate {
     
     func updateUI() {
         if results.isEmpty {
-            self.noResultsLabel.isHidden = false
-            self.usersTableView.isHidden = true
+            noResultsLabel.isHidden = false
+            usersTableView.isHidden = true
         } else {
-            self.noResultsLabel.isHidden = true
-            self.usersTableView.isHidden = false
-            self.usersTableView.reloadData()
+            noResultsLabel.isHidden = true
+            usersTableView.isHidden = false
+            usersTableView.reloadData()
         }
     }
 }

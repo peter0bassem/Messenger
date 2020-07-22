@@ -9,7 +9,7 @@
 import UIKit
 import SDWebImage
 
-class PhotoViewerViewController: UIViewController {
+final class PhotoViewerViewController: UIViewController {
     
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()

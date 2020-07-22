@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import JGProgressHUD
 
-class RegisterViewController: UIViewController {
+final class RegisterViewController: UIViewController {
     
     private lazy var spinner: JGProgressHUD = {
         let spinner = JGProgressHUD(style: .dark)
@@ -52,7 +52,7 @@ class RegisterViewController: UIViewController {
         textField.placeholder = "First Name"
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
         textField.leftViewMode = .always
-        textField.backgroundColor = .white
+        textField.backgroundColor = .secondarySystemBackground
         textField.keyboardType = .emailAddress
         textField.delegate = self
         return textField
@@ -69,7 +69,7 @@ class RegisterViewController: UIViewController {
         textField.placeholder = "Last Name"
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
         textField.leftViewMode = .always
-        textField.backgroundColor = .white
+        textField.backgroundColor = .secondarySystemBackground
         textField.keyboardType = .emailAddress
         textField.delegate = self
         return textField
@@ -86,7 +86,7 @@ class RegisterViewController: UIViewController {
         textField.placeholder = "Email"
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
         textField.leftViewMode = .always
-        textField.backgroundColor = .white
+        textField.backgroundColor = .secondarySystemBackground
         textField.keyboardType = .emailAddress
         textField.delegate = self
         return textField
@@ -103,7 +103,7 @@ class RegisterViewController: UIViewController {
         textField.placeholder = "Password"
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
         textField.leftViewMode = .always
-        textField.backgroundColor = .white
+        textField.backgroundColor = .secondarySystemBackground
         textField.isSecureTextEntry = true
         textField.delegate = self
         return textField
@@ -126,7 +126,7 @@ class RegisterViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         title = "Register"
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         //        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register", style: .done, target: self, action: #selector(didTapRegisterButton(_:)))
         
@@ -195,6 +195,10 @@ class RegisterViewController: UIViewController {
                     print("Error creating user:", error!)
                     return
                 }
+                
+                UserDefaults.standard.setValue(email, forKey: "email")
+                UserDefaults.standard.setValue("\(firstName) \(lastName)", forKey: "name")
+                
                 let chatUser = ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email)
                 DatabaseManager.shared.insertUser(with: chatUser) { (success) in
                     if success {
